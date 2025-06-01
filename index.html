@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FB & Telegram Group Directory</title>
   <style>
     body {
@@ -56,12 +57,6 @@
       padding: 1rem;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    .group-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
     .group-card h3 {
       margin: 0.5rem 0;
       font-size: 1.1rem;
@@ -75,17 +70,6 @@
       color: white;
       border: none;
       padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .load-more {
-      margin: 2rem auto;
-      display: block;
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      background: #4267B2;
-      color: white;
-      border: none;
       border-radius: 5px;
       cursor: pointer;
     }
@@ -103,94 +87,69 @@
     </div>
 
     <div class="categories" id="categories">
-      <button class="active" onclick="filterGroups('All')">All</button>
+      <button class="active" onclick="filterGroups('all')">All</button>
       <button onclick="filterGroups('Facebook')">Facebook</button>
       <button onclick="filterGroups('Telegram')">Telegram</button>
     </div>
 
-    <div class="group-list" id="groupList"></div>
-    <button id="loadMore" class="load-more">Load More</button>
+    <div class="group-list" id="groupList">
+      <!-- Groups will load here -->
+    </div>
   </div>
 
   <script>
     const adLink = "https://www.profitableratecpm.com/essbieqdn?key=fd3a2a8d642b3ca8a96276905d569b26";
-    let allGroups = [];
-    let filteredGroups = [];
-    let currentIndex = 0;
-    const batchSize = 50;
+    let groups = [];
+    let filteredCategory = 'all';
 
-    const groupList = document.getElementById("groupList");
-    const loadMoreBtn = document.getElementById("loadMore");
-    const searchInput = document.getElementById("search");
-    const buttons = document.querySelectorAll(".categories button");
+    async function loadGroups() {
+      const res = await fetch('groups.json');
+      groups = await res.json();
+      displayGroups(groups);
+    }
 
-    // Load JSON
-    fetch('groups.json')
-      .then(res => res.json())
-      .then(data => {
-        allGroups = data;
-        filteredGroups = [...allGroups];
-        renderGroups();
-      });
+    function displayGroups(groupsToDisplay) {
+      const groupList = document.getElementById('groupList');
+      groupList.innerHTML = '';
+      groupsToDisplay.forEach(group => {
+        const card = document.createElement('div');
+        card.className = 'group-card';
+        card.dataset.category = group.type;
 
-    // Render groups
-    function renderGroups() {
-      const nextBatch = filteredGroups.slice(currentIndex, currentIndex + batchSize);
-      nextBatch.forEach(group => {
-        const card = document.createElement("div");
-        card.className = "group-card";
         card.innerHTML = `
-          <img src="${group.image}" alt="Group Image" />
+          <img src="https://via.placeholder.com/300x120?text=${encodeURIComponent(group.name)}" alt="Group Image" />
           <h3>${group.name}</h3>
-          <p>${group.description}</p>
-          <button onclick="handleJoin('${group.id}', '${group.realLink}')">Join Now</button>
+          <p>${group.members} members - ${group.description}</p>
+          <button onclick="handleJoin('${group.id}', '${adLink}', '${group.joinLink}')">Join Now</button>
         `;
-        card.dataset.category = group.category;
+
         groupList.appendChild(card);
       });
-      currentIndex += batchSize;
-      if (currentIndex >= filteredGroups.length) {
-        loadMoreBtn.style.display = "none";
-      } else {
-        loadMoreBtn.style.display = "block";
-      }
     }
 
-    // Load More button
-    loadMoreBtn.addEventListener("click", renderGroups);
-
-    // Infinite scroll
-    window.addEventListener("scroll", () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-        renderGroups();
-      }
-    });
-
-    // Search functionality
-    searchInput.addEventListener("input", () => {
-      const search = searchInput.value.toLowerCase();
-      filteredGroups = allGroups.filter(group =>
-        group.name.toLowerCase().includes(search)
+    document.getElementById('search').addEventListener('input', (e) => {
+      const searchText = e.target.value.toLowerCase();
+      let filtered = groups.filter(group => 
+        group.name.toLowerCase().includes(searchText) && 
+        (filteredCategory === 'all' || group.type === filteredCategory)
       );
-      currentIndex = 0;
-      groupList.innerHTML = "";
-      renderGroups();
+      displayGroups(filtered);
     });
 
-    // Filter buttons
     function filterGroups(category) {
-      buttons.forEach(btn => btn.classList.remove("active"));
-      event.target.classList.add("active");
-      filteredGroups = category === "All"
-        ? allGroups
-        : allGroups.filter(group => group.category === category);
-      currentIndex = 0;
-      groupList.innerHTML = "";
-      renderGroups();
+      filteredCategory = category;
+      document.querySelectorAll('.categories button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      let filtered = groups.filter(group => category === 'all' || group.type === category);
+      const searchText = document.getElementById('search').value.toLowerCase();
+      if (searchText) {
+        filtered = filtered.filter(group => group.name.toLowerCase().includes(searchText));
+      }
+      displayGroups(filtered);
     }
 
-    // Handle join click
-    function handleJoin(groupId, realLink) {
+    function handleJoin(groupId, adLink, realLink) {
       const visited = localStorage.getItem(groupId);
       if (!visited) {
         localStorage.setItem(groupId, "clicked");
@@ -199,6 +158,8 @@
         window.open(realLink, "_blank");
       }
     }
+
+    loadGroups();
   </script>
 </body>
 </html>
