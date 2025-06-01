@@ -1,165 +1,303 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FB & Telegram Group Directory</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FB & Telegram Group Directory - Realistic</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: #4267B2;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  .container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 1rem;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .categories button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #e4e6eb;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+  .categories button.active {
+    background: #4267B2;
+    color: white;
+  }
+  #memberFilter {
+    margin-left: auto;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  .group-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 1rem;
+  }
+  .group-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+  .group-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .group-card h3 {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+  .group-card p {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+    flex-grow: 1;
+  }
+  .group-card .members {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  .group-card button {
+    background: #4267B2;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  @media (max-width:600px){
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
     }
-    header {
-      background: #4267B2;
-      color: white;
-      padding: 1rem;
-      text-align: center;
+    #memberFilter {
+      margin-left: 0;
     }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 1rem;
-    }
-    .search-box input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-    .categories {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .categories button {
-      padding: 0.5rem 1rem;
-      border: none;
-      background: #e4e6eb;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .categories button.active {
-      background: #4267B2;
-      color: white;
-    }
-    .group-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    .group-card {
-      background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    .group-card h3 {
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
-    }
-    .group-card p {
-      font-size: 0.9rem;
-      color: #555;
-    }
-    .group-card button {
-      background: #4267B2;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>FB & Telegram Group Directory</h1>
-    <p>Find and join top Facebook & Telegram groups</p>
-  </header>
 
-  <div class="container">
-    <div class="search-box">
-      <input type="text" id="search" placeholder="Search groups...">
-    </div>
+<header>
+  <h1>FB & Telegram Group Directory</h1>
+  <p>Find and join top Facebook & Telegram groups</p>
+</header>
 
+<div class="container">
+
+  <div class="filters">
     <div class="categories" id="categories">
       <button class="active" onclick="filterGroups('all')">All</button>
       <button onclick="filterGroups('Facebook')">Facebook</button>
       <button onclick="filterGroups('Telegram')">Telegram</button>
+      <button onclick="filterGroups('Tech')">Tech</button>
+      <button onclick="filterGroups('Crypto')">Crypto</button>
+      <button onclick="filterGroups('Earning')">Earning</button>
+      <button onclick="filterGroups('Gaming')">Gaming</button>
+      <button onclick="filterGroups('Others')">Others</button>
     </div>
-
-    <div class="group-list" id="groupList">
-      <!-- Groups will load here -->
-    </div>
+    <select id="memberFilter" onchange="filterByMembers()">
+      <option value="all">All Member Counts</option>
+      <option value="lt1k">&lt; 1K members</option>
+      <option value="1k-10k">1K - 10K members</option>
+      <option value="10k-100k">10K - 100K members</option>
+      <option value="gt100k">&gt; 100K members</option>
+    </select>
   </div>
 
-  <script>
-    const adLink = "https://www.profitableratecpm.com/essbieqdn?key=fd3a2a8d642b3ca8a96276905d569b26";
-    let groups = [];
-    let filteredCategory = 'all';
+  <input type="text" id="search" placeholder="Search groups..." style="width:100%; padding:0.5rem; margin-bottom:1rem; font-size:1rem;"/>
 
-    async function loadGroups() {
-      const res = await fetch('groups.json');
-      groups = await res.json();
-      displayGroups(groups);
+  <div class="group-list" id="groupList">
+
+    <!-- Groups go here dynamically -->
+
+  </div>
+</div>
+
+<script>
+const adLink = "https://www.profitableratecpm.com/essbieqdn?key=fd3a2a8d642b3ca8a96276905d569b26";
+
+const groups = [
+  // Sample groups, you can add more in this format
+  {
+    id: "fb_1",
+    name: "Tech Innovators",
+    category: "Tech",
+    platform: "Facebook",
+    members: 145000,
+    description: "A community of 145K+ tech enthusiasts and innovators.",
+    img: "https://images.unsplash.com/photo-1518773553398-650c184e0bb3?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://www.facebook.com/groups/techinnovators"
+  },
+  {
+    id: "fb_2",
+    name: "Online Earners Club",
+    category: "Earning",
+    platform: "Facebook",
+    members: 82000,
+    description: "82K+ members sharing online earning tips and methods.",
+    img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://www.facebook.com/groups/onlineearnersclub"
+  },
+  {
+    id: "tg_1",
+    name: "Crypto Signals Pro",
+    category: "Crypto",
+    platform: "Telegram",
+    members: 178000,
+    description: "Trusted group with 178K+ crypto signals and updates.",
+    img: "https://images.unsplash.com/photo-1517148815978-75f6acaaf32c?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://t.me/cryptosignalspro"
+  },
+  {
+    id: "tg_2",
+    name: "Gaming Zone",
+    category: "Gaming",
+    platform: "Telegram",
+    members: 15000,
+    description: "15K+ gamers discussing latest trends and tournaments.",
+    img: "https://images.unsplash.com/photo-1537432376769-00d66bf9ef55?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://t.me/gamingzone"
+  },
+  {
+    id: "fb_3",
+    name: "Telegram Group Promotions",
+    category: "Others",
+    platform: "Facebook",
+    members: 3200,
+    description: "Promote your Telegram groups and channels here!",
+    img: "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://www.facebook.com/groups/telegrampromotions"
+  },
+  {
+    id: "tg_3",
+    name: "Telegram Tech Zone",
+    category: "Tech",
+    platform: "Telegram",
+    members: 142000,
+    description: "Join 142K+ members sharing daily tech news and tips.",
+    img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?crop=entropy&cs=tinysrgb&fit=max&h=140&w=280",
+    joinLink: "https://t.me/telegramtechzone"
+  },
+  // ...add more groups here (copy and edit)
+];
+
+// State for filters
+let currentCategory = 'all';
+let currentMemberFilter = 'all';
+
+const groupListEl = document.getElementById("groupList");
+const categoriesEl = document.getElementById("categories");
+const memberFilterEl = document.getElementById("memberFilter");
+const searchEl = document.getElementById("search");
+
+function renderGroups() {
+  groupListEl.innerHTML = "";
+
+  // Get search term
+  const searchTerm = searchEl.value.toLowerCase();
+
+  const filteredGroups = groups.filter(group => {
+    // Filter by category
+    if (currentCategory !== "all" && group.category !== currentCategory && group.platform !== currentCategory) {
+      if (currentCategory !== "Facebook" && currentCategory !== "Telegram") return false;
+      // For platform filters Facebook or Telegram, filter by platform instead of category
+      if (currentCategory === "Facebook" && group.platform !== "Facebook") return false;
+      if (currentCategory === "Telegram" && group.platform !== "Telegram") return false;
     }
 
-    function displayGroups(groupsToDisplay) {
-      const groupList = document.getElementById('groupList');
-      groupList.innerHTML = '';
-      groupsToDisplay.forEach(group => {
-        const card = document.createElement('div');
-        card.className = 'group-card';
-        card.dataset.category = group.type;
-
-        card.innerHTML = `
-          <img src="https://via.placeholder.com/300x120?text=${encodeURIComponent(group.name)}" alt="Group Image" />
-          <h3>${group.name}</h3>
-          <p>${group.members} members - ${group.description}</p>
-          <button onclick="handleJoin('${group.id}', '${adLink}', '${group.joinLink}')">Join Now</button>
-        `;
-
-        groupList.appendChild(card);
-      });
+    // Filter by member count
+    switch(currentMemberFilter) {
+      case 'lt1k': if (group.members >= 1000) return false; break;
+      case '1k-10k': if (group.members < 1000 || group.members > 10000) return false; break;
+      case '10k-100k': if (group.members < 10000 || group.members > 100000) return false; break;
+      case 'gt100k': if (group.members <= 100000) return false; break;
     }
 
-    document.getElementById('search').addEventListener('input', (e) => {
-      const searchText = e.target.value.toLowerCase();
-      let filtered = groups.filter(group => 
-        group.name.toLowerCase().includes(searchText) && 
-        (filteredCategory === 'all' || group.type === filteredCategory)
-      );
-      displayGroups(filtered);
-    });
+    // Filter by search text
+    if (!group.name.toLowerCase().includes(searchTerm)) return false;
 
-    function filterGroups(category) {
-      filteredCategory = category;
-      document.querySelectorAll('.categories button').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+    return true;
+  });
 
-      let filtered = groups.filter(group => category === 'all' || group.type === category);
-      const searchText = document.getElementById('search').value.toLowerCase();
-      if (searchText) {
-        filtered = filtered.filter(group => group.name.toLowerCase().includes(searchText));
-      }
-      displayGroups(filtered);
-    }
+  if (filteredGroups.length === 0) {
+    groupListEl.innerHTML = "<p>No groups found.</p>";
+    return;
+  }
 
-    function handleJoin(groupId, adLink, realLink) {
-      const visited = localStorage.getItem(groupId);
-      if (!visited) {
-        localStorage.setItem(groupId, "clicked");
-        window.open(adLink, "_blank");
-      } else {
-        window.open(realLink, "_blank");
-      }
-    }
+  filteredGroups.forEach(group => {
+    const card = document.createElement("div");
+    card.className = "group-card";
 
-    loadGroups();
-  </script>
+    card.innerHTML = `
+      <img src="${group.img}" alt="${group.name}">
+      <h3>${group.name}</h3>
+      <p>${group.description}</p>
+      <div class="members">${group.members.toLocaleString()} members</div>
+      <button onclick="handleJoin('${group.id}', '${adLink}', '${group.joinLink}')">Join Now</button>
+    `;
+
+    groupListEl.appendChild(card);
+  });
+}
+
+function filterGroups(category) {
+  currentCategory = category;
+  // Update active button
+  categoriesEl.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+
+  renderGroups();
+}
+
+function filterByMembers() {
+  currentMemberFilter = memberFilterEl.value;
+  renderGroups();
+}
+
+searchEl.addEventListener("input", () => {
+  renderGroups();
+});
+
+function handleJoin(groupId, adLink, realLink) {
+  const visited = localStorage.getItem(groupId);
+  if (!visited) {
+    localStorage.setItem(groupId, "clicked");
+    window.open(adLink, "_blank");
+  } else {
+    window.open(realLink, "_blank");
+  }
+}
+
+renderGroups();
+</script>
+
 </body>
 </html>
